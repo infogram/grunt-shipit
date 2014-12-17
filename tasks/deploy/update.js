@@ -34,6 +34,7 @@ module.exports = function (grunt) {
       grunt.shipit.releaseDirname = grunt.template.date('UTC:yyyymmddHHMMss');
       grunt.shipit.releasesPath = path.join(grunt.shipit.config.deployTo, 'releases');
       grunt.shipit.releasePath = path.join(grunt.shipit.releasesPath, grunt.shipit.releaseDirname);
+      grunt.shipit.cachePath = path.join(grunt.shipit.config.deployTo, 'cache');
 
       grunt.log.writeln('Create release path "%s"', grunt.shipit.releasePath);
       grunt.shipit.remote('mkdir -p ' + grunt.shipit.releasePath, function (err) {
@@ -52,10 +53,14 @@ module.exports = function (grunt) {
     function remoteCopy(cb) {
       grunt.log.writeln('Copy project to remote servers.');
 
-      grunt.shipit.remoteCopy(grunt.shipit.config.workspace + '/', grunt.shipit.releasePath, function (err) {
+      grunt.shipit.remoteCopy(grunt.shipit.config.workspace + '/', grunt.shipit.cachePath, function (err) {
         if (err) return cb(err);
-        grunt.log.oklns('Finished copy.');
-        cb();
+        grunt.log.oklns('Finished cache copy.');
+        grunt.shipit.remote('rsync -a ' + grunt.shipit.cachePath + '/ ' + grunt.shipit.releasePath, function(err) {
+          if (err) return cb(err);
+          grunt.log.oklns('Finished release copy.');
+          cb();
+        });
       });
     }
   });
