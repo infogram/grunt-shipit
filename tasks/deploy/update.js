@@ -56,7 +56,8 @@ module.exports = function (grunt) {
       grunt.shipit.remoteCopy(grunt.shipit.config.workspace + '/', grunt.shipit.cachePath, function (err) {
         if (err) return cb(err);
         grunt.log.oklns('Finished cache copy.');
-        grunt.shipit.remote('rsync -a ' + grunt.shipit.cachePath + '/ ' + grunt.shipit.releasePath, function(err) {
+        // copy from cache directory by recursive hard-linking
+        grunt.shipit.remote('cd ' + grunt.shipit.cachePath + ' && find . | cpio -pld ' + grunt.shipit.releasePath, function(err) {
           if (err) return cb(err);
           grunt.log.oklns('Finished release copy.');
           cb();
