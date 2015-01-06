@@ -57,7 +57,8 @@ module.exports = function (grunt) {
         if (err) return cb(err);
         grunt.log.oklns('Finished cache copy.');
         // copy from cache directory by recursive hard-linking
-        grunt.shipit.remote('cd ' + grunt.shipit.cachePath + ' && find . | cpio -pld ' + grunt.shipit.releasePath, function(err) {
+        grunt.shipit.remote('cd ' + grunt.shipit.cachePath + ' && find . | cpio -pld ' +
+          grunt.shipit.releasePath + '  >/dev/null 2>&1', function(err) {
           if (err) return cb(err);
           grunt.log.oklns('Finished release copy.');
           cb();
